@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflow Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 16px;
+      background: #fafafa;
+      color: #1a1a1a;
+    }
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #111;
+    }
+    .workflow-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.15s;
+    }
+    .workflow-card:hover {
+      border-color: #a5b4fc;
+    }
+    .workflow-info { flex: 1; }
+    .workflow-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #1f2937;
+      margin-bottom: 2px;
+    }
+    .workflow-meta {
+      font-size: 11px;
+      color: #6b7280;
+      display: flex;
+      gap: 12px;
+    }
+    .workflow-status {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-active { background: #d1fae5; color: #065f46; }
+    .status-paused { background: #fef3c7; color: #92400e; }
+    .status-error { background: #fee2e2; color: #991b1b; }
+    .summary {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #eff6ff;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #1e40af;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .summary-stats {
+      display: flex;
+      gap: 16px;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #3b82f6;
+      letter-spacing: 0.5px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 32px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Workflow Status Dashboard</h2>
+  <div id="workflows">
+    <div class="empty-state">Loading workflows...</div>
+  </div>
+  <div id="summary"></div>
+
+  <script>
+    // Listen for data from CopilotKit via postMessage
+    window.addEventListener("message", (event) => {
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (data.workflows) {
+          renderWorkflows(data.workflows);
+        }
+      } catch (e) {
+        // Ignore non-JSON messages
+      }
+    });
+
+    function renderWorkflows(workflows) {
+      const container = document.getElementById("workflows");
+      const summary = document.getElementById("summary");
+
+      if (!workflows.length) {
+        container.innerHTML = '<div class="empty-state">No workflows found.</div>';
+        summary.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = workflows.map(w => {
+        const statusClass = w.success === false ? 'status-error' : `status-${w.status}`;
+        const lastRun = new Date(w.lastRun);
+        const timeAgo = getTimeAgo(lastRun);
+
+        return `
+          <div class="workflow-card">
+            <div class="workflow-info">
+              <div class="workflow-name">${escapeHtml(w.name)}</div>
+              <div class="workflow-meta">
+                <span>Last run: ${timeAgo}</span>
+                ${w.executions ? `<span>${w.executions} executions</span>` : ''}
+              </div>
+            </div>
+            <span class="workflow-status ${statusClass}">
+              ${w.success === false ? 'FAILED' : w.status.toUpperCase()}
+            </span>
+          </div>
+        `;
+      }).join("");
+
+      const active = workflows.filter(w => w.status === "active").length;
+      const paused = workflows.filter(w => w.status === "paused").length;
+      const failed = workflows.filter(w => w.success === false).length;
+      const totalExec = workflows.reduce((sum, w) => sum + (w.executions || 0), 0);
+
+      summary.innerHTML = `
+        <div class="summary">
+          <div class="summary-stats">
+            <div class="stat">
+              <div class="stat-value">${workflows.length}</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">${active}</div>
+              <div class="stat-label">Active</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">${paused}</div>
+              <div class="stat-label">Paused</div>
+            </div>
+            ${failed > 0 ? `
+              <div class="stat">
+                <div class="stat-value">${failed}</div>
+                <div class="stat-label">Failed</div>
+              </div>
+            ` : ''}
+            <div class="stat">
+              <div class="stat-value">${totalExec.toLocaleString()}</div>
+              <div class="stat-label">Executions</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getTimeAgo(date) {
+      const now = new Date();
+      const diff = Math.floor((now - date) / 1000);
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      return Math.floor(diff / 86400) + 'd ago';
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Fallback: render sample data if no message received within 3s
+    setTimeout(() => {
+      if (document.querySelector('.empty-state')) {
+        renderWorkflows([
+          { name: "Data Scraping Pipeline", status: "active", lastRun: new Date().toISOString(), success: true, executions: 142 },
+          { name: "Email Notification", status: "active", lastRun: new Date(Date.now() - 3600000).toISOString(), success: true, executions: 89 },
+          { name: "Report Generator", status: "paused", lastRun: new Date(Date.now() - 86400000).toISOString(), success: false, executions: 37 },
+          { name: "Database Sync", status: "active", lastRun: new Date(Date.now() - 1800000).toISOString(), success: true, executions: 256 },
+          { name: "API Health Monitor", status: "active", lastRun: new Date(Date.now() - 600000).toISOString(), success: true, executions: 1024 },
+        ]);
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
