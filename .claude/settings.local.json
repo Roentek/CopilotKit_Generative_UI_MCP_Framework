@@ -39,13 +39,13 @@
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "n8n-mcp",
-    "vapi-mcp",
     "tavily-mcp",
+    "vapi-mcp",
     "zep-mcp",
     "pinecone-mcp",
     "apify-mcp",
     "supabase-mcp",
-    "google-workspace-mcp",
-    "openrouter-mcp"
+    "openrouter-mcp",
+    "google-workspace-mcp"
   ]
 }
