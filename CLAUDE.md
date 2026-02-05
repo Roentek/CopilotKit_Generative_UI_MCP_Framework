@@ -6,12 +6,13 @@ You're working inside the **CopilotKit Generative UI MCP Framework**, a project 
 
 This project has three key layers:
 
-**Layer 1: CopilotKit Frontend (Next.js)**  
+**Layer 1: CopilotKit Frontend (Next.js)**
 
 - Located in `src/app/`
 - Provides a browser-based chat sidebar powered by CopilotKit
 - The API route at `src/app/api/copilotkit/route.ts` wires together the CopilotRuntime, BuiltInAgent, and MCPAppsMiddleware
-- Uses OpenRouter as the LLM provider (configured via `OPENAI_BASE_URL` environment variable)
+- Uses OpenRouter as the LLM provider (configured via `OPENAI_BASE_URL` and `OPENAI_API_KEY`)
+- Model selection is configurable via `OPENROUTER_MODEL` environment variable (defaults to `openai/gpt-4o`)
 
 **Layer 2: HTTP MCP Server**  
 

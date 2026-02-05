@@ -10,11 +10,15 @@ import { MCPAppsMiddleware } from "@ag-ui/mcp-apps-middleware";
 const MCP_SERVER_URL =
   process.env.MCP_SERVER_URL || "http://localhost:3001/mcp";
 
+// OpenRouter model selection (configurable via environment variable)
+const OPENROUTER_MODEL =
+  process.env.OPENROUTER_MODEL || "openai/gpt-4o";
+
 // Create the agent with MCP Apps middleware
 // Note: Type assertion needed due to duplicate @ag-ui/client versions
 // between @copilotkit/runtime and @ag-ui/mcp-apps-middleware
 const agent = new BuiltInAgent({
-  model: "openai/gpt-4o",
+  model: OPENROUTER_MODEL,
   prompt: `You are a helpful assistant integrated with the CopilotKit Generative UI MCP Framework.
 You have access to MCP tools that can return interactive UI components.
 When a tool returns UI, it will be rendered inline in the chat as an interactive widget.

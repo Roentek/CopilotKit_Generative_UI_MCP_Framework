@@ -101,6 +101,7 @@ CopilotKit_Generative_UI_MCP_Framework/
 | -------- | -------- | ----------- |
 | `OPENAI_API_KEY` | Yes | Your OpenRouter API key (used by CopilotKit runtime) |
 | `OPENAI_BASE_URL` | Yes | Set to `https://openrouter.ai/api/v1` for OpenRouter |
+| `OPENROUTER_MODEL` | No | Model to use (defaults to `openai/gpt-4o`) - see [OpenRouter models](https://openrouter.ai/models) |
 | `MCP_SERVER_URL` | No | MCP server URL (defaults to `http://localhost:3001/mcp`) |
 | `SUPABASE_API_PAT` | No | Supabase MCP access token |
 | `PINECONE_API_KEY` | No | Pinecone vector DB API key |
@@ -215,16 +216,24 @@ npm run mcp:dev
 
 This framework uses [OpenRouter](https://openrouter.ai) as the LLM provider. CopilotKit's runtime uses the OpenAI SDK internally, so by setting `OPENAI_BASE_URL` to `https://openrouter.ai/api/v1` and `OPENAI_API_KEY` to your OpenRouter key, all LLM calls route through OpenRouter transparently.
 
-The default model is `openai/gpt-4o`. To change it, edit the `model` field in [route.ts](src/app/api/copilotkit/route.ts):
+### Selecting a Model
 
-```typescript
-const agent = new BuiltInAgent({
-  model: "anthropic/claude-sonnet-4",  // Any OpenRouter model
-  prompt: "...",
-})
+The default model is `openai/gpt-4o`. To use a different model, set the `OPENROUTER_MODEL` environment variable in your `.env` file:
+
+```env
+OPENROUTER_MODEL=anthropic/claude-sonnet-4  # Any OpenRouter model
 ```
 
-See [OpenRouter models](https://openrouter.ai/models) for available options.
+Popular options:
+
+- `openai/gpt-4o` - OpenAI GPT-4 Omni (default, balanced performance)
+- `anthropic/claude-sonnet-4` - Claude Sonnet 4 (excellent reasoning)
+- `anthropic/claude-opus-4` - Claude Opus 4 (most capable)
+- `google/gemini-2.0-flash-thinking-exp:free` - Google Gemini 2.0 Flash (free tier)
+- `meta-llama/llama-3.3-70b-instruct` - Llama 3.3 70B
+- `deepseek/deepseek-chat` - DeepSeek V3 (cost-effective)
+
+See the full list at [OpenRouter models](https://openrouter.ai/models).
 
 ## Troubleshooting
 
