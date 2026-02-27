@@ -1,10 +1,14 @@
 "use client";
 
 import { CopilotSidebar } from "@copilotkit/react-ui";
+import { WorkflowDashboardTool } from "./components/WorkflowDashboard";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen">
+      {/* Register Frontend Tools */}
+      <WorkflowDashboardTool />
+
       <main className="flex-1 p-8 max-w-5xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
