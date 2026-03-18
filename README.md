@@ -1,5 +1,7 @@
 # CopilotKit Generative UI MCP Framework
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A plug-and-play framework for building AI-powered generative user interfaces using [CopilotKit](https://copilotkit.ai), [MCP Apps](https://docs.copilotkit.ai/generative-ui-specs/mcp-apps), and [OpenRouter](https://openrouter.ai). MCP server tools return interactive HTML components that render directly in a browser-based chat interface.
 
 This project includes a Next.js frontend with CopilotKit, an HTTP MCP server with sample UI-generating tools, and 9 pre-configured MCP server integrations for Claude Code.
